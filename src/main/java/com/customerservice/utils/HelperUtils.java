@@ -2,6 +2,8 @@ package com.customerservice.utils;
 
 import org.springframework.stereotype.Component;
 
+import java.util.Random;
+
 @Component
 public class HelperUtils {
 
@@ -45,4 +47,9 @@ public class HelperUtils {
 		            + "</html>"; 
 		 return htmlContent;
 	}
+
+	public int generateOtp(){
+		Random random = new Random();
+        return 100000 + random.nextInt(900000);
+    }
 }

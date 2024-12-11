@@ -3,6 +3,7 @@ package com.customerservice.controller;
 import java.util.List;
 import java.util.UUID;
 
+import com.customerservice.dto.UpdatePasswordDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.http.HttpStatus;
@@ -12,13 +13,7 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.customerservice.dto.LoginRequestDto;
 import com.customerservice.dto.OrderDto;
@@ -134,6 +129,28 @@ public class UserController {
 		}
 		}
 		return new ResponseEntity<>("User not Validated successfully", HttpStatus.FAILED_DEPENDENCY);
+	}
+
+	@PutMapping("/updatePassword")
+	public ResponseEntity<String> resetPassword(@RequestBody UpdatePasswordDto updatePasswordData){
+
+
+			SignUp signUp = signUpRepo.getByEmailId(updatePasswordData.getEmail());
+			if(signUp.getEmailToken().equalsIgnoreCase(updatePasswordData.getOtp())) {
+				SignUpservice.updatePassword(signUp.getId(), updatePasswordData.getNewPassword());
+				return new ResponseEntity<>("Password Updated successfully", HttpStatus.CREATED);
+			}
+		return new ResponseEntity<>("Invalid Email or Wrong Otp", HttpStatus.FORBIDDEN);
+	}
+	@PostMapping("/getUpdatePasswordOtp")
+	public ResponseEntity<String> resetPasswordOtp(@RequestBody UpdatePasswordDto updatePasswordData){
+		if (loginService.hasUserWithEmail(updatePasswordData.getEmail())) {
+			String otp = String.valueOf(helperUtils.generateOtp());
+			SignUpservice.updateEmailToken(updatePasswordData.getEmail(), otp);
+			emailService.sendSimpleMessage(updatePasswordData.getEmail(), "Reset Password Otp : Kartik Yatra", "Otp to reset the password "+otp);
+			return new ResponseEntity<>("Otp Sent Successfully", HttpStatus.ACCEPTED);
+		}
+		return new ResponseEntity<>("Invalid Email", HttpStatus.FORBIDDEN);
 	}
 
 	private void doAuthenticate(String email, String password) {

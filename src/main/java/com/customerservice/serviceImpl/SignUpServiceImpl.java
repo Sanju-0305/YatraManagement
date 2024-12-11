@@ -54,4 +54,14 @@ public class SignUpServiceImpl implements SignUpService{
 		return signUp;
 	}
 
+	@Override
+	public void updatePassword(long user_id, String password) {
+		signUpRepo.updatePassword(user_id, passwordEncoder.encode(password));
+	}
+
+	@Override
+	public void updateEmailToken(String email_id, String emailToken) {
+		signUpRepo.updateEmailToken(email_id, emailToken);
+	}
+
 }

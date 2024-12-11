@@ -27,4 +27,14 @@ public interface SignUpRepo extends JpaRepository<SignUp, Long>{
 	@Query(value = "SELECT count(*) FROM sign_up where email_id = :emailId and active = 'Y'",nativeQuery=true)
 	int getByAvticeEmailId(String emailId);
 
+	@Transactional
+	@Modifying
+	@Query(value = "UPDATE  sign_up set password =:password where user_id = :user_id",nativeQuery=true)
+	void updatePassword(long user_id, String password);
+
+	@Transactional
+	@Modifying
+	@Query(value = "UPDATE  sign_up set email_token =:email_token where email_id = :email_id",nativeQuery=true)
+	void updateEmailToken(String email_id, String email_token);
+
 }
